@@ -1,8 +1,15 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
+dotenv.config();
+
 const cors = require("cors");
 const Razorpay = require("razorpay");
+
+const razorpay = new Razorpay({
+  key_id: process.env.RAZORPAY_KEY_ID,
+  key_secret: process.env.RAZORPAY_KEY_SECRET
+});
 
 const userRoutes = require('./routes/userRoutes');
 const orderRoutes = require("./routes/orderRoutes");
@@ -399,12 +406,6 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () =>
   console.log(`✅ Server running on port ${PORT}`)
 );
-
-
-
-
-
-
 
 
 
