@@ -1,8 +1,15 @@
 const Chat = require("../models/Chat");
 
 exports.getConversations = async (req, res) => {
-  const chats = await Chat.find();
-  res.json(chats);
+  try {
+    console.log('Fetching conversations...');
+    const chats = await Chat.find();
+    console.log(`Found ${chats.length} conversations`);
+    res.json(chats);
+  } catch (error) {
+    console.error('Error fetching conversations:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
 };
 
 exports.getMessages = async (req, res) => {

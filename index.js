@@ -417,10 +417,13 @@ const seedProducts = async () => {
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => {
-    console.log("✅ MongoDB Connected");
+    console.log("✅ MongoDB Connected successfully");
     seedProducts();
   })
-  .catch((err) => console.log(err));
+  .catch((err) => {
+    console.error("❌ MongoDB Connection Error:", err);
+    process.exit(1); // Exit if DB connection fails
+  });
 
 // Test Route
 app.get("/", (req, res) => {

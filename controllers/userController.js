@@ -3,10 +3,12 @@ const User = require('../models/user');
 // Get all users
 exports.getUsers = async (req, res) => {
   try {
+    console.log('Fetching users from database...');
     const users = await User.find({}).select('-password');
+    console.log(`Found ${users.length} users`);
     res.json(users);
   } catch (error) {
-    console.error(error);
+    console.error('Error fetching users:', error);
     res.status(500).json({ message: 'Server error' });
   }
 };
