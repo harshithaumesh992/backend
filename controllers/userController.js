@@ -211,8 +211,8 @@ exports.registerUser = async (req, res) => {
       errors.push('Password must contain at least one special character');
     }
 
-    // Address validation
-    if (!address || address.trim().length < 10) {
+    // Address validation (optional)
+    if (address && address.trim().length < 10) {
       errors.push('Address must be at least 10 characters');
     }
 
@@ -233,15 +233,17 @@ exports.registerUser = async (req, res) => {
     const user = new User({ 
       name: name.trim(), 
       phone, 
-      address: address.trim(), 
+      address: address ? address.trim() : '', 
       email: email.toLowerCase(), 
       password 
     });
+    console.log('Attempting to save user:', { name: user.name, email: user.email, phone: user.phone });
     await user.save();
+    console.log('User saved successfully');
 
-    res.status(201).json({ message: 'Registration successful', user });
+    res.status(201).json({ message: 'Registration successful', user: { id: user._id, name: user.name, email: user.email, role: user.role } });
   } catch (error) {
-    console.error(error);
+    console.error('Registration error:', error);
     // Handle MongoDB duplicate key error
     if (error.code === 11000) {
       const field = Object.keys(error.keyPattern)[0];
@@ -252,7 +254,7 @@ exports.registerUser = async (req, res) => {
       const messages = Object.values(error.errors).map(e => e.message);
       return res.status(400).json({ message: messages.join(', ') });
     }
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Server error', details: error.message });
   }
 };
 
