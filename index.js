@@ -25,8 +25,23 @@ dotenv.config();
 
 const app = express();
 
-// Middleware
-app.use(cors());
+const allowedOrigins = [
+  'https://harshithacart.onrender.com',
+  'https://harshithacart-frontend.onrender.com',
+  'http://localhost:5173',
+  'http://localhost:3000'
+];
+
+app.use(cors({
+  origin: function(origin, callback) {
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true
+}));
 app.use(express.json());
 
 // Routes
