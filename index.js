@@ -26,7 +26,8 @@ dotenv.config();
 const app = express();
 
 const allowedOrigins = [
-  'https://harshithacart.onrender.com',
+  'https://harshuucart.onrender.com',  // Updated to match your frontend URL
+  'https://harshithacart.onrender.com',  // Keep if needed
   'https://harshithacart-frontend.onrender.com',
   'http://localhost:5173',
   'http://localhost:3000'
@@ -37,12 +38,19 @@ app.use(cors({
     if (!origin || allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
+      console.log(`CORS blocked origin: ${origin}`);
       callback(new Error('Not allowed by CORS'));
     }
   },
   credentials: true
 }));
 app.use(express.json());
+
+// Request logging middleware
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.originalUrl}`);
+  next();
+});
 
 // Routes
 app.use('/api/users', userRoutes);
@@ -417,6 +425,12 @@ mongoose
 // Test Route
 app.get("/", (req, res) => {
   res.send("Backend Running...");
+});
+
+// Catch-all 404 handler
+app.use((req, res) => {
+  console.log(`404 - Route not found: ${req.method} ${req.originalUrl}`);
+  res.status(404).json({ error: "Route not found" });
 });
 
 const PORT = process.env.PORT || 5000;
