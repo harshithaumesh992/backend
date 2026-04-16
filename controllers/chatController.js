@@ -13,22 +13,36 @@ exports.getConversations = async (req, res) => {
 };
 
 exports.getMessages = async (req, res) => {
-  const chat = await Chat.findById(req.params.id);
-  res.json(chat.messages);
+  try {
+    const chat = await Chat.findById(req.params.id);
+    if (!chat) {
+      return res.status(404).json({ message: 'Chat not found' });
+    }
+    res.json(chat.messages);
+  } catch (error) {
+    console.error('Error getting messages:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
 };
 
 exports.sendMessage = async (req, res) => {
-  const { sender, senderName, text } = req.body;
+  try {
+    const { sender, senderName, text } = req.body;
+    const chat = await Chat.findById(req.params.id);
+    if (!chat) {
+      return res.status(404).json({ message: 'Chat not found' });
+    }
 
-  const chat = await Chat.findById(req.params.id);
+    chat.messages.push({
+      sender,
+      senderName,
+      text
+    });
 
-  chat.messages.push({
-    sender,
-    senderName,
-    text
-  });
-
-  await chat.save();
-
-  res.json(chat);
+    await chat.save();
+    res.json(chat);
+  } catch (error) {
+    console.error('Error sending message:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
 };

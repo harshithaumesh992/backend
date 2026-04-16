@@ -26,25 +26,29 @@ dotenv.config();
 const app = express();
 
 const allowedOrigins = [
-  'https://harshuucart.onrender.com',  // Updated to match your frontend URL
-  'https://harshithacart.onrender.com',  // Keep if needed
+  process.env.FRONTEND_URL || 'https://harshuucart.onrender.com',
+  'https://harshithacart.onrender.com',
   'https://harshithacart-frontend.onrender.com',
   'http://localhost:5173',
   'http://localhost:3000'
 ];
 
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
 app.use(cors({
   origin: function(origin, callback) {
     if (!origin || allowedOrigins.indexOf(origin) !== -1) {
-      callback(null, true);
-    } else {
-      console.log(`CORS blocked origin: ${origin}`);
-      callback(new Error('Not allowed by CORS'));
+      return callback(null, true);
     }
+    console.log(`CORS blocked origin: ${origin}`);
+    return callback(new Error('Not allowed by CORS'));
   },
-  credentials: true
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
-app.use(express.json());
+app.options('*', cors());
 
 // Request logging middleware
 app.use((req, res, next) => {
@@ -428,6 +432,15 @@ mongoose
 // Test Route
 app.get("/", (req, res) => {
   res.send("Backend Running...");
+});
+
+// Global error handler
+app.use((err, req, res, next) => {
+  console.error('Global error handler:', err);
+  if (err.message === 'Not allowed by CORS') {
+    return res.status(403).json({ error: 'CORS blocked: origin not allowed' });
+  }
+  res.status(err.status || 500).json({ error: err.message || 'Server error' });
 });
 
 // Catch-all 404 handler
