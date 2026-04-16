@@ -418,15 +418,14 @@ const seedProducts = async () => {
 };
 
 // MongoDB Connection
-mongoose
-  .connect(process.env.MONGO_URI)
+mongoose.connect(process.env.MONGO_URI)
   .then(() => {
-    console.log("✅ MongoDB Connected successfully");
+    console.log("MongoDB Connected");
     seedProducts();
   })
-  .catch((err) => {
-    console.error("❌ MongoDB Connection Error:", err);
-    process.exit(1); // Exit if DB connection fails
+  .catch(err => {
+    console.error("MongoDB Error:", err);
+    process.exit(1);
   });
 
 // Test Route
